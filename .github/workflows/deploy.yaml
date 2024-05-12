@@ -22,3 +22,15 @@ jobs:
       - run: docker push janmichaelse/multi-nginx 
       - run: docker push janmichaelse/multi-server
       - run: docker push janmichaelse/multi-worker
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+          application_name: multi-gh
+          environment_name: Multigh-env
+          existing_bucket_name: elasticbeanstalk-us-east-1-471112950863
+          region: us-east-1
+          version_label: ${{ github.sha }}
+          deployment_package: deploy.zip
