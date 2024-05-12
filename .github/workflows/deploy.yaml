@@ -1,0 +1,24 @@
+name: Deploy Frontend
+on:
+  push:
+    branches:
+      - main
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - run: docker build -t cygnetops/react-test -f Dockerfile.dev .
+      - run: docker run -e CI=true cygnetops/react-test npm test
+ 
+      - run: docker build -t janmichaelse/multi-client ./client
+      - run: docker build -t janmichaelse/multi-nginx ./nginx
+      - run: docker build -t janmichaelse/multi-server ./server
+      - run: docker build -t janmichaelse/multi-worker ./worker
+
+      - run: docker push janmichaelse/multi-client
+      - run: docker push janmichaelse/multi-nginx 
+      - run: docker push janmichaelse/multi-server
+      - run: docker push janmichaelse/multi-worker
